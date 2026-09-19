@@ -12,8 +12,7 @@ load_dotenv()
 
 
 class Config:
-    GOOGLE_SEARCH_API_KEY: str = os.getenv("GOOGLE_SEARCH_API_KEY", "")
-    GOOGLE_CSE_ID: str = os.getenv("GOOGLE_CSE_ID", "")
+    TAVILY_API_KEY: str = os.getenv("TAVILY_API_KEY", "")
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
 
     @classmethod
@@ -22,8 +21,7 @@ class Config:
         missing = [
             name
             for name, value in {
-                "GOOGLE_SEARCH_API_KEY": cls.GOOGLE_SEARCH_API_KEY,
-                "GOOGLE_CSE_ID": cls.GOOGLE_CSE_ID,
+                "TAVILY_API_KEY": cls.TAVILY_API_KEY,
                 "GEMINI_API_KEY": cls.GEMINI_API_KEY,
             }.items()
             if not value
