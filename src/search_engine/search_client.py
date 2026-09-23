@@ -55,8 +55,3 @@ def search(query: str, num_results: int = 5) -> list[SearchResult]:
         )
         for item in results
     ]
-
-if __name__ == "__main__":
-    results = search("machine learning transformers")
-    for r in results:
-        print(r["title"], "-", r["link"])

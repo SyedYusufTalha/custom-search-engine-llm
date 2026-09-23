@@ -62,10 +62,3 @@ def summarize(query: str, results: list[SearchResult]) -> str:
         raise RuntimeError(f"LLM summarization failed: {exc}") from exc
 
     return response.text
-
-if __name__ == "__main__":
-    from .search_client import search
-
-    query = "machine learning transformers"
-    results = search(query)
-    print(summarize(query, results))
