@@ -1,0 +1,30 @@
+[project]
+name = "custom-search-engine-llm"
+version = "0.1.0"
+description = "A CLI search engine combining Tavily web search with Gemini LLM summarization."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Syed Yusuf Talha" }
+]
+dependencies = [
+    "tavily-python>=0.5.0",
+    "google-genai>=1.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+]
+
+[project.scripts]
+search-engine = "src.search_engine.main:run"
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

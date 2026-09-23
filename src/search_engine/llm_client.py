@@ -4,7 +4,7 @@ summarize and synthesize search results into a readable answer.
 """
 
 import logging
-
+import time
 from google import genai
 
 from .config import config
@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
 _client = genai.Client(api_key=config.GEMINI_API_KEY)
 
 _MODEL = "gemini-3.6-flash"  # fast + cheap, good fit for summarization tasks
-
+_MAX_RETRIES = 3
+_RETRY_DELAY_SECONDS = 5
 
 def _build_prompt(query: str, results: list[SearchResult]) -> str:
     """Format search results into a prompt for Gemini to synthesize."""
@@ -52,13 +53,23 @@ def summarize(query: str, results: list[SearchResult]) -> str:
 
     prompt = _build_prompt(query, results)
 
-    try:
-        response = _client.models.generate_content(
-            model=_MODEL,
-            contents=prompt,
-        )
-    except Exception as exc:
-        logger.error("Gemini API call failed for query %r: %s", query, exc)
-        raise RuntimeError(f"LLM summarization failed: {exc}") from exc
+    last_exc = None
+    for attempt in range(1, _MAX_RETRIES + 1):
+        try:
+            response = _client.models.generate_content(
+                model=_MODEL,
+                contents=prompt,
+            )
+            return response.text
+        except Exception as exc:
+            last_exc = exc
+            logger.warning(
+                "Gemini API call attempt %d/%d failed for query %r: %s",
+                attempt, _MAX_RETRIES, query, exc,
+            )
+            if attempt < _MAX_RETRIES:
+                time.sleep(_RETRY_DELAY_SECONDS)
 
-    return response.text
+    logger.error("Gemini API call failed after %d attempts for query %r: %s",
+                 _MAX_RETRIES, query, last_exc)
+    raise RuntimeError(f"LLM summarization failed after {_MAX_RETRIES} attempts: {last_exc}") from last_exc
